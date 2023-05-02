@@ -56,13 +56,15 @@ public class XMLConsumer {
                     log.info("person "+ json.get("person"));
 
                     // Insert JSON data into MySQL
-                    String sql = "INSERT INTO person (address,name,age) VALUES (?,?,?)";
+                    String sql = "INSERT INTO person (name,address,age) VALUES (?,?,?) ON DUPLICATE KEY UPDATE address=?, age=?";
                     try (PreparedStatement statement = connection.prepareStatement(sql)) {
                         JSONObject person = (JSONObject) json.get("person");
-//                        String city = (String) address.get("city");
-                        statement.setString(1, (String) person.get("address"));
-                        statement.setString(2, (String) person.get("name"));
+//
+                        statement.setString(1, (String) person.get("name"));
+                        statement.setString(2, (String) person.get("address"));
                         statement.setString(3, String.valueOf((Integer)person.get("age")));
+                        statement.setString(4, (String) person.get("address")); // set the new value for field1 (if the row exists)
+                        statement.setString(5, String.valueOf((Integer)person.get("age"))); // set the new value for field2 (if the row exists)
 //                        stmt.setString(1, json.getString("name"));
                         log.info("statement is "+ statement);
                         statement.executeUpdate();
