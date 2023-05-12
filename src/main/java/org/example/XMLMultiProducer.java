@@ -16,7 +16,7 @@ import java.util.Properties;
 
 public class XMLMultiProducer {
 
-    private static final String KAFKA_TOPIC = "my-xml-topic";
+    private static final String KAFKA_TOPIC = "my-ott-topic";
 
     public static void main(String[] args) throws IOException {
         final Logger log = LoggerFactory.getLogger(XMLConsumer.class);

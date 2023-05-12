@@ -23,7 +23,7 @@ public class XMLConsumer {
     private static final String MYSQL_URL = "jdbc:mysql://localhost:3306/kafka_demo";
     private static final String MYSQL_USER = "root";
     private static final String MYSQL_PASSWORD = "9731397020Vin*";
-    private static final String KAFKA_TOPIC = "my-xml-topic";
+    private static final String KAFKA_TOPIC = "my-ott-topic";
 
     public static void main(String[] args) {
         // Create Kafka consumer properties
@@ -31,7 +31,7 @@ public class XMLConsumer {
         props.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         props.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
         props.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "my-kafka-group");
+        props.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "my-ott-group");
         props.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
         // Create a Kafka consumer
@@ -51,20 +51,28 @@ public class XMLConsumer {
                     log.info("Key: " + record.key() + ", Value: " + record.value());
 
                     // Convert XML to JSON
-                    JSONObject json = (JSONObject) XML.toJSONObject(xml);
+                    JSONObject json =  XML.toJSONObject(xml);
                     log.info("Json string contains" + json);
-                    log.info("person "+ json.get("person"));
+                    log.info("ott_demo "+ json.get("ott_demo"));
 
                     // Insert JSON data into MySQL
-                    String sql = "INSERT INTO person (name,address,age) VALUES (?,?,?) ON DUPLICATE KEY UPDATE address=?, age=?";
+                    String sql = "INSERT INTO ott_data (FERT,F_CODE,DESCRIPTION,PID,QS,PTM,PUBLISH_DATE) VALUES (?,?,?,?,?,?,?) ON DUPLICATE KEY " +
+                            "UPDATE DESCRIPTION=?, PID=?,QS=?, PTM=?, PUBLISH_DATE=?";
                     try (PreparedStatement statement = connection.prepareStatement(sql)) {
-                        JSONObject person = (JSONObject) json.get("person");
+                        JSONObject ott_data = (JSONObject) json.get("ott_demo");
 //
-                        statement.setString(1, (String) person.get("name"));
-                        statement.setString(2, (String) person.get("address"));
-                        statement.setString(3, String.valueOf((Integer)person.get("age")));
-                        statement.setString(4, (String) person.get("address")); // set the new value for field1 (if the row exists)
-                        statement.setString(5, String.valueOf((Integer)person.get("age"))); // set the new value for field2 (if the row exists)
+                        statement.setString(1, (String) ott_data.get("fert"));
+                        statement.setString(2, (String) ott_data.get("fcode"));
+                        statement.setString(3, (String) ott_data.get("desc"));
+                        statement.setString(4, (String) ott_data.get("pid"));
+                        statement.setString(5, (String) ott_data.get("qs"));
+                        statement.setString(6, (String) ott_data.get("ptm"));
+                        statement.setString(7, (String) ott_data.get("date"));
+                        statement.setString(8, (String) ott_data.get("desc"));  // set the new value for field2 (if the row exists)
+                        statement.setString(9, (String) ott_data.get("pid"));   // set the new value for field2 (if the row exists)
+                        statement.setString(10, (String) ott_data.get("qs"));    // set the new value for field2 (if the row exists)
+                        statement.setString(11, (String) ott_data.get("ptm"));   // set the new value for field2 (if the row exists)
+                        statement.setString(12, (String) ott_data.get("date"));  // set the new value for field2 (if the row exists)
 //                        stmt.setString(1, json.getString("name"));
                         log.info("statement is "+ statement);
                         statement.executeUpdate();
